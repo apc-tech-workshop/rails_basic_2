@@ -126,9 +126,24 @@ $ bundle exec rails g scaffold place personal:references name:string address:str
 
 ## fix place_controller.rb
 
-## add geocode
+## fix application_controller.rb
 
-- [ref](http://ja.asciicasts.com/episodes/273-geocoder)
+```
+$ vi app/controller/application_controller.rb
+```
+
+```ruby
+class ApplicationController < ActionController::Base
+  # Prevent CSRF attacks by raising an exception.
+  # For APIs, you may want to use :null_session instead.
+  protect_from_forgery with: :null_session
+end
+```
+
+## add geocoder
+
+- [ref1](http://ja.asciicasts.com/episodes/273-geocoder)
+- [ref2](http://www.synbioz.com/blog/search_by_location_with_geocoder)
 
 ```
 $ vi Gemfile
@@ -136,9 +151,55 @@ $ bundle install
 ```
 
 ```ruby
-gem 'geocode'
+gem 'geocoder'
 
 group :development, :test do
 ...
 end
 ```
+
+```
+$ vi config/initializers/geocoder.rb
+```
+
+```ruby
+Geocoder.configure(
+  # geocoding service
+  lookup: :google,
+
+  # geocoding service request timeout (in seconds)
+  timeout: 3,
+
+  # default units
+  units: :km
+)
+```
+
+```
+$ vi app/models/place.ru
+```
+
+```ruby
+class Place < ActiveRecord::Base
+  belongs_to :personal
+  
+  attr_accessor :address, :latitude, :longitude
+  geocoded_by :address
+  after_validation :geocode
+end
+```
+
+## test
+
+```
+POST http://localhost:3000/places/search
+{
+    "personal_id" : 1,
+    "name" : "肉の万世 秋葉原本店",
+    "address" : "東京都千代田区神田須田町２−２１"
+}
+
+{"result":{"status":"ok","msg":"","personal_name":"服部","place":{"id":4,"personal_id":1,"name":"肉の万世 秋葉原本店","address":"東京都千代田区神田須田町２−２１","latitude":35.6963613,"longitude":139.7710718,"created_at":"2015-05-19T14:03:02.904Z","updated_at":"2015-05-19T14:03:02.904Z"}}}
+```
+
+

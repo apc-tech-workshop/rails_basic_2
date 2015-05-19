@@ -176,8 +176,8 @@ RSpec.describe PlacesController, type: :controller do
             personal_id: 1,
             name: "肉の万世 秋葉原本店",
             address: "東京都千代田区神田須田町２−２１",
-            latitude: 35.696361,
-            longitude: 139.771072,
+            latitude: 35.6963613,
+            longitude: 139.7710718,
           }
         }
       }.to_json

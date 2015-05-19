@@ -65,9 +65,7 @@ GEM
       railties (>= 3.0.0)
     ffi (1.9.8)
     formatador (0.2.5)
-    geocode (0.2.1)
-      json
-      trollop
+    geocoder (1.2.8)
     globalid (0.3.5)
       activesupport (>= 4.1.0)
     guard (2.12.5)
@@ -198,7 +196,6 @@ GEM
     tilt (1.4.1)
     timers (4.0.1)
       hitimes
-    trollop (2.1.2)
     turbolinks (2.5.3)
       coffee-rails
     tzinfo (1.2.2)
@@ -220,7 +217,7 @@ DEPENDENCIES
   coffee-rails (~> 4.1.0)
   database_cleaner
   factory_girl_rails
-  geocode
+  geocoder
   guard-rspec
   jbuilder (~> 2.0)
   jquery-rails

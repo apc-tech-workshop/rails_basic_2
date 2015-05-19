@@ -73,8 +73,8 @@ class PlacesController < ApplicationController
       place.personal_id = personal_id
       place.name = place_name
       place.address = place_address
-      place.latitude = 35.696361
-      place.longitude = 139.771072
+      #place.latitude = 35.696361
+      #place.longitude = 139.771072
       place.save!
 
       out = Jbuilder.encode do |json|
