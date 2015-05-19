@@ -81,6 +81,7 @@ class PlacesController < ApplicationController
         json.result do 
           json.status "ok"
           json.msg ""
+          json.personal_name Personal.find(personal_id).name
           json.place place
         end
       end

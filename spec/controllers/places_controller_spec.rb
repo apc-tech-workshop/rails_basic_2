@@ -170,6 +170,7 @@ RSpec.describe PlacesController, type: :controller do
         result: {
           status: "ok",
           msg: "",
+          personal_name: "服部",
           place: {
             id: 1,
             personal_id: 1,
@@ -204,6 +205,7 @@ RSpec.describe PlacesController, type: :controller do
 
       expect(actual['status']).to eq(expected['status'])
       expect(actual['msg']).to eq(expected['msg'])
+      expect(actual['personal_name']).to eq(expected['personal_name'])
 
       actual_place = actual['place']
       expect_place = expected['place']

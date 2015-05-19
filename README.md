@@ -113,3 +113,32 @@ $ bundle exec guard
 $ bundle exec rails g scaffold personal name:string
 $ bundle exec rails g scaffold place personal:references name:string address:string latitude:float longitude:float
 ```
+
+## run guard
+
+## edit routing_rspec
+
+## fix route.rb 
+
+## edit place_controller.rb
+
+## fix place_controller_rspec.rb with factory_girl
+
+## fix place_controller.rb
+
+## add geocode
+
+- [ref](http://ja.asciicasts.com/episodes/273-geocoder)
+
+```
+$ vi Gemfile
+$ bundle install
+```
+
+```ruby
+gem 'geocode'
+
+group :development, :test do
+...
+end
+```
