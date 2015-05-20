@@ -64,13 +64,14 @@ class PlacesController < ApplicationController
 
   def search
     personal_id = place_params[:personal_id]
+    personal = Personal.find(personal_id)
 
-    if Personal.find(personal_id)
+    if personal
       place_name = place_params[:name]
       place_address = place_params[:address]
 
       place = Place.new
-      place.personal_id = personal_id
+      place.personal_id = personal.id
       place.name = place_name
       place.address = place_address
       #place.latitude = 35.696361
@@ -81,7 +82,7 @@ class PlacesController < ApplicationController
         json.result do 
           json.status "ok"
           json.msg ""
-          json.personal_name Personal.find(personal_id).name
+          json.personal_name place.personal.name
           json.place place
         end
       end

@@ -1,3 +1,5 @@
+[TOC]
+
 # sample code for apc rails workshop.
 
 - [api doc & mock](http://docs.apcrailsws.apiary.io/)
@@ -20,6 +22,92 @@
 
 - require : [postman REST client](https://chrome.google.com/webstore/detail/postman-rest-client-packa/fhbjgbiflinjbdggehcddcbncdddomop)
 
+## 0. bundle exec rails s までの道のり
+
+- [bundler](http://qiita.com/znz/items/5471e5826fde29fa9a80)
+
+```
+$ gem install bundler
+$ gem list | grep bundler
+
+$ mkdir apc_rails_ws
+$ cd apc_rails_ws
+
+$ bundle init
+$ vi Gemfile
+```
+
+```ruby
+source 'https://rubygems.org'
+
+gem 'rails'
+```
+
+```
+$ bundle install --path=vendor/bundle
+....
+$ bundle exec rails new .
+$ vi Gemfile
+```
+
+- use `sqlite3`
+
+```ruby
+source 'https://rubygems.org'
+
+# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
+gem 'rails', '4.2.1'
+# Use sqlite3 as the database for Active Record
+gem 'sqlite3'
+# Use SCSS for stylesheets
+gem 'sass-rails', '~> 5.0'
+# Use Uglifier as compressor for JavaScript assets
+gem 'uglifier', '>= 1.3.0'
+# Use CoffeeScript for .coffee assets and views
+gem 'coffee-rails', '~> 4.1.0'
+# See https://github.com/rails/execjs#readme for more supported runtimes
+# gem 'therubyracer', platforms: :ruby
+
+# Use jquery as the JavaScript library
+gem 'jquery-rails'
+# Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
+gem 'turbolinks'
+# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+gem 'jbuilder', '~> 2.0'
+# bundle exec rake doc:rails generates the API under doc/api.
+gem 'sdoc', '~> 0.4.0', group: :doc
+
+# Use ActiveModel has_secure_password
+# gem 'bcrypt', '~> 3.1.7'
+
+# Use Unicorn as the app server
+# gem 'unicorn'
+
+# Use Capistrano for deployment
+# gem 'capistrano-rails', group: :development
+
+group :development, :test do
+  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'byebug'
+
+  # Access an IRB console on exception pages or by using <%= console %> in views
+  gem 'web-console', '~> 2.0'
+
+  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  gem 'spring'
+end
+```
+
+```
+$ bundle install
+$ bundle clean
+$ bundle exec rails s
+
+.. 他のshellから下記を実行
+
+$ curl -X GET 'http://localhost:3000/'
+```
+
 ## 1. gem config
 
 ```
@@ -41,13 +129,56 @@ $ vi Gemfile
 ```
 
 ```ruby
-group :development, :test do
-  gem "spring-commands-rspec"
+source 'https://rubygems.org'
 
-  gem 'rspec-rails'
-  gem 'guard-rspec'
-  gem 'factory_girl_rails'
-  gem 'database_cleaner'
+
+# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
+gem 'rails', '4.2.1'
+# Use sqlite3 as the database for Active Record
+gem 'sqlite3'
+# Use SCSS for stylesheets
+gem 'sass-rails', '~> 5.0'
+# Use Uglifier as compressor for JavaScript assets
+gem 'uglifier', '>= 1.3.0'
+# Use CoffeeScript for .coffee assets and views
+gem 'coffee-rails', '~> 4.1.0'
+# See https://github.com/rails/execjs#readme for more supported runtimes
+# gem 'therubyracer', platforms: :ruby
+
+# Use jquery as the JavaScript library
+gem 'jquery-rails'
+# Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
+gem 'turbolinks'
+# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+gem 'jbuilder', '~> 2.0'
+# bundle exec rake doc:rails generates the API under doc/api.
+gem 'sdoc', '~> 0.4.0', group: :doc
+
+# Use ActiveModel has_secure_password
+# gem 'bcrypt', '~> 3.1.7'
+
+# Use Unicorn as the app server
+# gem 'unicorn'
+
+# Use Capistrano for deployment
+# gem 'capistrano-rails', group: :development
+
+group :development, :test do
+  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'byebug'
+
+  # Access an IRB console on exception pages or by using <%= console %> in views
+  gem 'web-console', '~> 2.0'
+
+  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  gem 'spring'
+  gem "spring-commands-rspec" # append
+
+  gem 'rspec-rails' # append
+  gem 'guard-rspec' # append
+  gem 'factory_girl_rails' # append
+  gem 'database_cleaner' # append
+
 end
 ```
 
@@ -75,11 +206,18 @@ require 'factory_girl'
 require 'database_cleaner'
 
 RSpec.configure do |config|
-  # append rspec configuration
-  config.order = 'random'
+  
+  config.expect_with :rspec do |expectations|
+    expectations.include_chain_clauses_in_custom_matcher_descriptions = true
+  end
+
+  config.mock_with :rspec do |mocks|
+    mocks.verify_partial_doubles = true
+  end
+
+  config.order = :random
 
   # append factory_girl configuration
-  config.use_transactional_fixtures = false
   config.include FactoryGirl::Syntax::Methods
   config.before(:all) do
     FactoryGirl.reload
@@ -114,17 +252,128 @@ guard :rspec, cmd: 'spring rspec -f doc' do
 end
 ```
 
-```
-$ bundle exec rake db:create
-$ bundle exec rake db:migrate
-```
-
 ## 5. confirmation
+
+### ER
+
+| Personal    |
+| ----------- |
+| id          |
+| name:string |
+| created_at  |
+| upadted_at  |
+
+| Place               |
+| ------------------- |
+| id                  |
+| personal:reference  |
+| name:string         |
+| address:string      |
+| latitude:float      |
+| longitude:float     |
+| created_at          |
+| upadted_at          |
+
+
+```
+Personal -- 1:* -- Place
+```
 
 ```
 $ bundle exec rails g scaffold personal name:string
 $ bundle exec rails g scaffold place personal:references name:string address:string latitude:float longitude:float
+
+$ bundle exec rake db:create
+$ bundle exec rake db:migrate
 ```
+
+### 間違えたら
+
+```
+$ bundle exec rails g scaffold personal name:string
+
+                    |
+                    V
+
+$ bundle exec rails d scaffold personal name:string
+```
+
+```
+$ bundle exec rails g scaffold personal name:string
+      invoke  active_record
+      create    db/migrate/20150520135822_create_personals.rb
+      create    app/models/personal.rb
+      invoke    test_unit
+      create      test/models/personal_test.rb
+      create      test/fixtures/personals.yml
+      invoke  resource_route
+       route    resources :personals
+      invoke  scaffold_controller
+      create    app/controllers/personals_controller.rb
+      invoke    erb
+      create      app/views/personals
+      create      app/views/personals/index.html.erb
+      create      app/views/personals/edit.html.erb
+      create      app/views/personals/show.html.erb
+      create      app/views/personals/new.html.erb
+      create      app/views/personals/_form.html.erb
+      invoke    test_unit
+      create      test/controllers/personals_controller_test.rb
+      invoke    helper
+      create      app/helpers/personals_helper.rb
+      invoke      test_unit
+      invoke    jbuilder
+      create      app/views/personals/index.json.jbuilder
+      create      app/views/personals/show.json.jbuilder
+      invoke  assets
+      invoke    coffee
+      create      app/assets/javascripts/personals.coffee
+      invoke    scss
+      create      app/assets/stylesheets/personals.scss
+      invoke  scss
+      create    app/assets/stylesheets/scaffolds.scss
+
+$ bundle exec rails d scaffold personal name:string
+      invoke  active_record
+      remove    db/migrate/20150520135822_create_personals.rb
+      remove    app/models/personal.rb
+      invoke    test_unit
+      remove      test/models/personal_test.rb
+      remove      test/fixtures/personals.yml
+      invoke  resource_route
+       route    resources :personals
+      invoke  scaffold_controller
+      remove    app/controllers/personals_controller.rb
+      invoke    erb
+      remove      app/views/personals
+      remove      app/views/personals/index.html.erb
+      remove      app/views/personals/edit.html.erb
+      remove      app/views/personals/show.html.erb
+      remove      app/views/personals/new.html.erb
+      remove      app/views/personals/_form.html.erb
+      invoke    test_unit
+      remove      test/controllers/personals_controller_test.rb
+      invoke    helper
+      remove      app/helpers/personals_helper.rb
+      invoke      test_unit
+      invoke    jbuilder
+      remove      app/views/personals
+      remove      app/views/personals/index.json.jbuilder
+      remove      app/views/personals/show.json.jbuilder
+      invoke  assets
+      invoke    coffee
+      remove      app/assets/javascripts/personals.coffee
+      invoke    scss
+      remove      app/assets/stylesheets/personals.scss
+      invoke  scss
+```
+
+- rspecなどが対応するmodel,controller,view,routeその他もろもろ用に生成されるのが確認出来る
+- ついでにmodelも確認してみる
+  - id,created_at, updated_atは自動生成される上に、railsの内部で利用される暗黙の了解なのでなるべく指定しない方がいい
+　- `db/migrate/*_create_places.rb`を参照すると`references`と書かれているが、sqlite3を他のアプリで開くとpersonal_id:integerとなっているのが分かる。
+  - 手動で personal_id:integerと書いて、`app/models/place.rb`に`belongs_to :personal`と書けばjoinの準備がやっとできる。
+  - しかし、今回はscaffoldの時に`personal:references`を指定したのでそれらは全て生成済みだ。
 
 ## 6. delete views spec
 
@@ -198,6 +447,56 @@ end
 $ vi spec/controllers/places_controller_spec.rb
 ```
 
+### rspec 構造
+
+```ruby
+describe クラス名, type: railsクラスのタイプ(:controllerなど) do
+  describe "説明的文字列" do
+    let(:変数名){
+      # ruby文法の式や値など
+      # 宣言が :hoge なら、 読み込みは hoge
+    }
+
+    before do
+      # 直上のdescribeのスコープ内で最初に１度だけ実行するコード
+      # 他に after などがある
+    end
+
+    before :each do 
+      # 直上のdescribeのスコープ内でitが検証される毎に直前に実行するコード
+      # 他に after :each などがある
+    end
+
+    it "説明的文字列" do  
+      expect(実測値).to eq(期待値)
+      # .to以外に null判定などいくつかある
+      # eq以外に 正規表現などいくつかある
+    end 
+  end
+end
+```
+
+### factory girl 構造
+
+```ruby
+FactoryGirl.define do
+  # 以降 factory ** do -- end のブロックを書き連ねて行く
+  factory :変数名, class: modelのクラス名 do
+    # :変数名はprojectを通して常にuniqueにした方がいい
+    # 複数のrspecをコマンドラインで実行するときの名前衝突を回避する目的
+    # spec/factoriesに切り出しても良いが、２枚のファイルを見比べてコードを書くのは大変なので冗長でも１枚に収めたほうが楽
+    カラム名 値
+  end
+  FactoryGirl.create(:変数名)
+  # .createの他に.buildなどがある
+end
+# FactoryGirlによって追加されたダミーデータは
+# database_cleanerにより、スコープを抜けた時に対象のmodelはtruncateされる
+# テスト毎に作成したダミーデータが衝突しなくなり互いのテストの依存度がゼロになる
+```
+
+### sample code
+
 ```ruby
 describe "POST #search" do
   let(:params){
@@ -270,39 +569,59 @@ $ vi app/controllers/places_controller.rb
 ```
 
 ```ruby
-def search
-  personal_id = place_params[:personal_id]
+require 'jbuilder'
 
-  if Personal.find(personal_id)
-    place_name = place_params[:name]
-    place_address = place_params[:address]
+class PlacesController < ApplicationController
+  before_action :set_place, only: [:show, :edit, :update, :destroy]
 
-    place = Place.new
-    place.personal_id = personal_id
-    place.name = place_name
-    place.address = place_address
-    place.latitude = 35.6963613 # TODO 後でgeocoderで実測値を設定させる
-    place.longitude = 139.7710718 # TODO 後でgeocoderで実測値を設定させる
-    place.save!
+  #... 
 
-    out = Jbuilder.encode do |json|
-      json.result do
-        json.status "ok"
-        json.msg ""
-        json.personal_name Personal.find(personal_id).name
-        json.place place
+  def search
+    personal_id = place_params[:personal_id]
+    personal = Personal.find(personal_id)
+
+    if personal
+      place_name = place_params[:name]
+      place_address = place_params[:address]
+
+      place = Place.new
+      place.personal_id = personal.id
+      place.name = place_name
+      place.address = place_address
+      place.latitude = 35.6963613 # TODO 後でgeocoderで実測値を設定させる
+      place.longitude = 139.7710718 # TODO 後でgeocoderで実測値を設定させる
+      place.save!
+
+      out = Jbuilder.encode do |json|
+        json.result do
+          json.status "ok"
+          json.msg ""
+          json.personal_name place.personal.name
+          json.place place
+        end
       end
-    end
-    render json: out, status: :ok
-  else
-    out = Jbuilder.encode do |json|
-      json.result do
-        json.status "error"
-        json.msg "undefined personal data"
+      render json: out, status: :ok
+    else
+      out = Jbuilder.encode do |json|
+        json.result do
+          json.status "error"
+          json.msg "undefined personal data"
+        end
       end
+      render json: out, status: :unprocessable_entity
     end
-    render json: out, status: :unprocessable_entity
   end
+
+  private
+  # Use callbacks to share common setup or constraints between actions.
+    def set_place
+      @place = Place.find(params[:id])
+    end
+
+    # Never trust parameters from the scary internet, only allow the white list through.
+    def place_params
+      params.require(:place).permit(:personal_id, :name, :address, :latitude, :longitude)
+    end
 end
 ```
 
@@ -368,7 +687,27 @@ class Place < ActiveRecord::Base
 end
 ```
 
-## 15. client test
+## 15. fix place_controller (latitude, longitude)
+
+```
+$ vi app/controllers/places_controller.rb
+```
+
+```ruby
+place = Place.new
+place.personal_id = personal.id
+place.name = place_name
+place.address = place_address
+#place.latitude = 35.6963613
+#place.longitude = 139.7710718
+place.save!
+```
+
+## 16. client test
+
+- ブラウザでデータを１件だけ作成
+  - [local](http://localhost:3000/personals)
+
 
 ```
 POST http://localhost:3000/places/search
@@ -378,7 +717,28 @@ POST http://localhost:3000/places/search
     "address" : "東京都千代田区神田須田町２−２１"
 }
 
-{"result":{"status":"ok","msg":"","personal_name":"服部","place":{"id":4,"personal_id":1,"name":"肉の万世 秋葉原本店","address":"東京都千代田区神田須田町２−２１","latitude":35.6963613,"longitude":139.7710718,"created_at":"2015-05-19T14:03:02.904Z","updated_at":"2015-05-19T14:03:02.904Z"}}}
+response:
+
+{
+  "result": {
+    "status": "ok",
+    "msg": "",
+    "personal_name": "服部",
+    "place": {
+      "id": 1,
+      "personal_id": 1,
+      "name": "肉の万世 秋葉原本店",
+      "address": "東京都千代田区神田須田町２−２１",
+      "latitude": 35.6963613,
+      "longitude": 139.7710718,
+      "created_at": "2015-05-19T14:03:02.904Z",
+      "updated_at": "2015-05-19T14:03:02.904Z"
+    }
+  }
+}
 ```
 
+### エラーが出る場合
 
+- `ActionController::ParameterMissing in PlacesController#search`が出る場合の対処法
+  - HTTP Headerに `Content-Type: application/json` を指定する事で回避可能
