@@ -1,6 +1,4 @@
 Rails.application.routes.draw do
-  get 'api/search'
-
   resources :places do
     collection do
       post 'search'
