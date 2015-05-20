@@ -18,6 +18,10 @@
 - heroku
   - gitignore
 
+# story
+
+テストファースト環境を整えて、railsのscaffoldを利用したらそこから少しずつtestを繰り返しながらAPI志向のアプリを作成し、googleがサービスするgeocoderを簡単に触ってしまおうというgemの利用とherokuにアプリを置いて外からREST clientで叩いて遊ぶ。
+
 # note
 
 - require : [postman REST client](https://chrome.google.com/webstore/detail/postman-rest-client-packa/fhbjgbiflinjbdggehcddcbncdddomop)
