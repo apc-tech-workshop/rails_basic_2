@@ -47,6 +47,7 @@ gem 'rails'
 $ bundle install --path=vendor/bundle
 ....
 $ bundle exec rails new .
+$ echo 'vendor/bundle/*' >> .gitignore
 $ vi Gemfile
 ```
 
@@ -122,9 +123,6 @@ update: --no-ri --no-rdoc
 ## 2. rspec
 
 ```
-$ cd apc_rails_ws/
-$ bundle exec rails new . --skip-test-unit
-$ echo 'vendor/bundle/*' >> .gitignore
 $ vi Gemfile
 ```
 
