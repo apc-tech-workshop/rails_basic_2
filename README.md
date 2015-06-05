@@ -1,9 +1,45 @@
-[TOC]
+<!-- MarkdownTOC -->
 
+- [sample code for apc rails workshop.](#sample-code-for-apc-rails-workshop)
+- [topic](#topic)
+- [story](#story)
+- [note](#note)
+  - [0. bundle exec rails s までの道のり](#0-bundle-exec-rails-s-までの道のり)
+  - [1. gem config](#1-gem-config)
+  - [2. rspec](#2-rspec)
+  - [3. factory_girl_rails and database_cleaner](#3-factory_girl_rails-and-database_cleaner)
+    - [factory_girl_rails](#factory_girl_rails)
+    - [database_cleaner](#database_cleaner)
+    - [config](#config)
+  - [4. guard-rspec](#4-guard-rspec)
+  - [5. confirmation](#5-confirmation)
+    - [ER](#er)
+    - [間違えたら](#間違えたら)
+  - [6. delete views spec](#6-delete-views-spec)
+  - [7. run guard](#7-run-guard)
+  - [8. edit routing_rspec](#8-edit-routing_rspec)
+  - [9. fix routes.rb](#9-fix-routesrb)
+  - [10. edit place_controller.rb](#10-edit-place_controllerrb)
+  - [11. fix place_controller_rspec.rb with factory_girl](#11-fix-place_controller_rspecrb-with-factory_girl)
+    - [rspec 構造](#rspec-構造)
+    - [factory girl 構造](#factory-girl-構造)
+    - [sample code](#sample-code)
+  - [12. fix place_controller.rb](#12-fix-place_controllerrb)
+  - [13. fix application_controller.rb](#13-fix-application_controllerrb)
+  - [14. add geocoder](#14-add-geocoder)
+  - [15. fix place_controller (latitude, longitude)](#15-fix-place_controller-latitude-longitude)
+  - [16. client test](#16-client-test)
+    - [エラーが出る場合](#エラーが出る場合)
+
+<!-- /MarkdownTOC -->
+
+
+<a name="sample-code-for-apc-rails-workshop"></a>
 # sample code for apc rails workshop.
 
 - [api doc & mock](http://docs.apcrailsws.apiary.io/)
 
+<a name="topic"></a>
 # topic
 
 - rspec & guard
@@ -18,14 +54,17 @@
 - heroku
   - gitignore
 
+<a name="story"></a>
 # story
 
 テストファースト環境を整えて、railsのscaffoldを利用したらそこから少しずつtestを繰り返しながらAPI志向のアプリを作成し、googleがサービスするgeocoderを簡単に触ってしまおうというgemの利用とherokuにアプリを置いて外からREST clientで叩いて遊ぶ。
 
+<a name="note"></a>
 # note
 
 - require : [postman REST client](https://chrome.google.com/webstore/detail/postman-rest-client-packa/fhbjgbiflinjbdggehcddcbncdddomop)
 
+<a name="0-bundle-exec-rails-s-までの道のり"></a>
 ## 0. bundle exec rails s までの道のり
 
 - [bundler](http://qiita.com/znz/items/5471e5826fde29fa9a80)
@@ -113,6 +152,7 @@ $ bundle exec rails s
 $ curl -X GET 'http://localhost:3000/'
 ```
 
+<a name="1-gem-config"></a>
 ## 1. gem config
 
 ```
@@ -124,6 +164,7 @@ install: --no-ri --no-rdoc
 update: --no-ri --no-rdoc
 ```
 
+<a name="2-rspec"></a>
 ## 2. rspec
 
 ```
@@ -190,17 +231,21 @@ $ bundle exec rails g rspec:install
 $ vi spec/spec_helper.rb
 ```
 
+<a name="3-factory_girl_rails-and-database_cleaner"></a>
 ## 3. factory_girl_rails and database_cleaner
 
+<a name="factory_girl_rails"></a>
 ### factory_girl_rails
 
 > factory_girl is a fixtures replacement with a straightforward definition syntax, support for multiple build strategies (saved instances, unsaved instances, attribute hashes, and stubbed objects), and support for multiple factories for the same class (user, admin_user, and so on), including factory inheritance.
 
 
+<a name="database_cleaner"></a>
 ### database_cleaner
 
 > Database Cleaner is a set of strategies for cleaning your database in Ruby.
 
+<a name="config"></a>
 ### config
 
 ```ruby
@@ -240,6 +285,7 @@ RSpec.configure do |config|
 end
 ```
 
+<a name="4-guard-rspec"></a>
 ## 4. guard-rspec
 
 ```
@@ -254,8 +300,10 @@ guard :rspec, cmd: 'spring rspec -f doc' do
 end
 ```
 
+<a name="5-confirmation"></a>
 ## 5. confirmation
 
+<a name="er"></a>
 ### ER
 
 | Personal    |
@@ -289,6 +337,7 @@ $ bundle exec rake db:create
 $ bundle exec rake db:migrate
 ```
 
+<a name="間違えたら"></a>
 ### 間違えたら
 
 ```
@@ -377,6 +426,7 @@ $ bundle exec rails d scaffold personal name:string
   - 手動で personal_id:integerと書いて、`app/models/place.rb`に`belongs_to :personal`と書けばjoinの準備がやっとできる。
   - しかし、今回はscaffoldの時に`personal:references`を指定したのでそれらは全て生成済みだ。
 
+<a name="6-delete-views-spec"></a>
 ## 6. delete views spec
 
 - レイアウトのテストも可能だが今回はcontrollerの入出力だけで十分なので削除する
@@ -385,6 +435,7 @@ $ bundle exec rails d scaffold personal name:string
 $ rm -rf spec/views
 ```
 
+<a name="7-run-guard"></a>
 ## 7. run guard
 
 ```
@@ -393,6 +444,7 @@ $ bundle exec guard
 
 > and enter
 
+<a name="8-edit-routing_rspec"></a>
 ## 8. edit routing_rspec
 
 ```
@@ -407,6 +459,7 @@ end
 
 > return to guard and enter
 
+<a name="9-fix-routesrb"></a>
 ## 9. fix routes.rb 
 
 ```
@@ -428,6 +481,7 @@ resources :personals
 $ bundle exec rake routes | grep search
 ```
 
+<a name="10-edit-place_controllerrb"></a>
 ## 10. edit place_controller.rb
 
 ```
@@ -441,6 +495,7 @@ def search
 end
 ```
 
+<a name="11-fix-place_controller_rspecrb-with-factory_girl"></a>
 ## 11. fix place_controller_rspec.rb with factory_girl
 
 - see : [api](http://docs.apcrailsws.apiary.io/)
@@ -449,6 +504,7 @@ end
 $ vi spec/controllers/places_controller_spec.rb
 ```
 
+<a name="rspec-構造"></a>
 ### rspec 構造
 
 ```ruby
@@ -478,6 +534,7 @@ describe クラス名, type: railsクラスのタイプ(:controllerなど) do
 end
 ```
 
+<a name="factory-girl-構造"></a>
 ### factory girl 構造
 
 ```ruby
@@ -497,6 +554,7 @@ end
 # テスト毎に作成したダミーデータが衝突しなくなり互いのテストの依存度がゼロになる
 ```
 
+<a name="sample-code"></a>
 ### sample code
 
 ```ruby
@@ -564,6 +622,7 @@ describe "POST #search" do
 end
 ```
 
+<a name="12-fix-place_controllerrb"></a>
 ## 12. fix place_controller.rb
 
 ```
@@ -627,6 +686,7 @@ class PlacesController < ApplicationController
 end
 ```
 
+<a name="13-fix-application_controllerrb"></a>
 ## 13. fix application_controller.rb
 
 ```
@@ -641,6 +701,7 @@ class ApplicationController < ActionController::Base
 end
 ```
 
+<a name="14-add-geocoder"></a>
 ## 14. add geocoder
 
 - [ref1](http://ja.asciicasts.com/episodes/273-geocoder)
@@ -689,6 +750,7 @@ class Place < ActiveRecord::Base
 end
 ```
 
+<a name="15-fix-place_controller-latitude-longitude"></a>
 ## 15. fix place_controller (latitude, longitude)
 
 ```
@@ -705,6 +767,7 @@ place.address = place_address
 place.save!
 ```
 
+<a name="16-client-test"></a>
 ## 16. client test
 
 - ブラウザでデータを１件だけ作成
@@ -740,6 +803,7 @@ response:
 }
 ```
 
+<a name="エラーが出る場合"></a>
 ### エラーが出る場合
 
 - `ActionController::ParameterMissing in PlacesController#search`が出る場合の対処法
